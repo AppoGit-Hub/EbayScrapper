@@ -1,3 +1,4 @@
+#STD
 import os
 import sys
 import time
@@ -7,22 +8,26 @@ from logging import Logger
 import datetime as dt
 from dataclasses import asdict
 
+#EXTERN
 import psycopg2
-from prometheus_client import start_http_server, Counter
-
-import notify
-from scrap import run
-from utils import get_json_as
-from models import (
-    PostgressCredential, 
-    MailCredential, 
+from prometheus_client import (
+    start_http_server, 
+    Counter
 )
-from common import (
+
+#INTERN
+from ebayscrapper.core import (
+    send_message,
+    get_json_as,
     POSTGRESS_CREDENTIAL_FILENAME, 
     MAIL_CREDENTIAL_FILENAME, 
     LOG_DIRECTORY, 
     LINKS_FILENAME,
     LOGNAME_PATTERN
+)
+from ebayscrapper.model import (
+    PostgressCredential, 
+    MailCredential, 
 )
 
 def get_logger():
@@ -74,18 +79,9 @@ if __name__ == "__main__":
                     cursor = connection.cursor()
 
                     logger.info("Connected to database!")
-                    logger.info("Scrapping begings...")
+                    logger.info("Scrapping begings...")                        
 
-                    for subject, link in links.items():
-                        scrap_stats, run_stats = run(subject, link, cursor)
-
-                        skipped.inc(run_stats.skipped)
-                        
-                        total.inc(scrap_stats.total)
-                        exist.inc(scrap_stats.exist)
-                        added.inc(scrap_stats.added)
-
-                    logger.info(f"Scrapping ended with {json.dumps(asdict(run_stats))}")
+                    #logger.info(f"Scrapping ended with {json.dumps(asdict(scrap_stats))}")
                     logger.info("Commit to databse...")
                     
                     connection.commit()
@@ -95,13 +91,15 @@ if __name__ == "__main__":
                 except Exception as error:
                     logger.exception(error)
 
-                    notify.send_message(
+                    """
+                    send_message(
                         mail.sender, 
                         mail.password, 
                         mail.receiver, 
                         f"Error ebayscrap with {subject}", 
                         f"Error with {error} with {json.dumps(asdict(run_stats))}"
                     )
+                    """
                 finally:
                     logger.info("Closing database connecion...")
 

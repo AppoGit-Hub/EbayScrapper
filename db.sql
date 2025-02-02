@@ -1,19 +1,51 @@
-DROP TABLE IF EXISTS offer;
-CREATE TABLE offer (
-    id VARCHAR,
-    date DATE,
-    title VARCHAR,
-    type VARCHAR,
-    is_new VARCHAR NULL,
-    star DECIMAL NULL,
+DROP TABLE IF EXISTS Offer;
+DROP TABLE IF EXISTS Seller;
+DROP TABLE IF EXISTS Category;
+DROP TABLE IF EXISTS OfferHistory;
+DROP TABLE IF EXISTS SellerHistory;
+
+CREATE TABLE Category (
+    name VARCHAR,
+    PRIMARY KEY (name)
+);
+
+CREATE TABLE Seller (
+    pseudo VARCHAR,
+    PRIMARY KEY (pseudo)
+);
+
+CREATE TABLE SellerHistory (
+    date DATE NOT NULL,
+    sales_count INT NOT NULL,
+    satisfaction DECIMAL NOT NULL,
+
+    PRIMARY KEY (date, seller),
+    FOREIGN KEY (pseudo) REFERENCES seller(pseudo),
+);
+
+CREATE TABLE Offer (
+    title VARCHAR NOT NULL,
     subtitle VARCHAR NULL,
-    price DECIMAL NULL,
-    pseudo VARCHAR NULL,
-    sales_count INTEGER NULL,
-    satisfaction DECIMAL NULL,
-    bid_count INTEGER NULL,
-    purchase VARCHAR NULL,
     shipping VARCHAR NULL,
     country VARCHAR NULL,
-    CONSTRAINT pk_offer PRIMARY KEY (id, date, title, type)
+
+    seller VARCHAR NOT NULL,
+    type VARCHAR NOT NULL,  
+
+    PRIMARY KEY (title, seller),
+    FOREIGN KEY (seller) REFERENCES seller(pseudo),
+    FOREIGN KEY (type) REFERENCES category(name)
+);
+
+CREATE TABLE OfferHistory (
+    date DATE NOT NULL,
+    star DECIMAL NULL,
+    price DECIMAL NULL,
+    bid_count INTEGER NULL,
+
+    title VARCHAR NOT NULL,
+    seller VARCHAR NOT NULL,
+
+    PRIMARY KEY (date, seller),
+    FOREIGN KEY (title, seller) REFERENCES offer(title, seller)
 );

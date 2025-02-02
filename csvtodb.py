@@ -1,10 +1,9 @@
 
 if __name__ == "__main__":
     import os, sys, json, psycopg2, csv
-    import offer
-    from common import POSTGRESS_CREDENTIAL_FILENAME
-    from queries import INSERT_QUERY
-    from scrap import notnull, nullable
+    #from common import POSTGRESS_CREDENTIAL_FILENAME
+    #from ebayscrapper.core.queries import INSERT_QUERY
+    #from scrap import notnull, nullable
 
     postgress_path: str = os.path.abspath(POSTGRESS_CREDENTIAL_FILENAME)
     with open(postgress_path, 'r') as key_file:
